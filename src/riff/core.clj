@@ -40,18 +40,21 @@
     (reset! riff-length new-riff-length)))
 
 (defn play
-  ([riff metro] (play riff metro (metro)))
-  ([riff metro beat]
+  ([riff metro] (play riff metro (bar metro)))
+  ([riff metro br]
      (let [notes-to-play (degrees->pitches (riff-notes riff) (riff-scale riff) (riff-root riff))]
+       (info "play " riff " metro " br)
        (dorun
         (map (fn [note offset]
-               (at (metro (+ beat offset))
+               (at
+                (+ (bar metro br) (* (tick metro) offset))
+                ;; (bar metro (+ br offset))
                    (beep note)
                    (info "RiffPlayer note: " note
-                         "  time: " (metro (+ beat offset)))))
+                         "  time: " (bar metro (+ br offset)))))
              notes-to-play
              (riff-offsets riff)))
-       (apply-at (metro (inc beat))  #'play riff[metro (inc beat)]))))
+       (apply-at (bar metro (inc br))  #'play riff [metro (inc br)]))))
 
 (defn riff [riff-root riff-scale riff-notes riff-offsets riff-length]
   (let [riff-root (atom riff-root)
@@ -61,6 +64,6 @@
         riff-length (atom riff-length)]
     (Riff. riff-root riff-scale riff-notes riff-offsets riff-length)))
 
-(def riffp (riff :c5 :major [:i :iii :v :i+] [0 1/4 1/2 3/4] 4))
+(def riffp (riff :c5 :major [:i :iii :v :i+] [0 1 2 3] 4))
 
 (play riffp metro)
