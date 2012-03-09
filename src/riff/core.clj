@@ -18,10 +18,10 @@
     "Returns notes or sets it to new-riff-notes")
   (riff-offsets [this] [this new-riff-offsets]
     "Returns offsets or sets it to new-riff-offsets")
-  (riff-offset [this] [this new-riff-offset]
-    "Returns offset or sets it to new-riff-offset"))
+  (riff-shift [this] [this new-riff-shift]
+    "Returns shift or sets it to new-riff-shift"))
 
-(deftype Riff [riff-root riff-scale riff-notes riff-offsets riff-offset]
+(deftype Riff [riff-root riff-scale riff-notes riff-offsets riff-shift]
   IRiff
   (riff-root [this] @riff-root)
   (riff-root [this new-riff-root]
@@ -35,35 +35,50 @@
   (riff-offsets [this] @riff-offsets)
   (riff-offsets [this new-riff-offsets]
     (reset! riff-offsets new-riff-offsets))
-  (riff-offset [this] @riff-offset)
-  (riff-offset [this new-riff-offset]
-    (reset! riff-offset new-riff-offset)))
+  (riff-shift [this] @riff-shift)
+  (riff-shift [this new-riff-shift]
+    (reset! riff-shift new-riff-shift)))
 
 (defn riff [riff-root riff-scale riff-notes riff-offsets]
   (let [riff-root (atom riff-root)
         riff-scale (atom riff-scale)
         riff-notes (atom riff-notes)
         riff-offsets (atom riff-offsets)
-        riff-offset (atom 0)]
-    (Riff. riff-root riff-scale riff-notes riff-offsets riff-offset)))
+        riff-shift (atom 0)]
+    (Riff. riff-root riff-scale riff-notes riff-offsets riff-shift)))
 
 (def riffp (riff :c5 :major [:i :iii :v :i+] [0 1.5 2 3]))
 
 (defn play
-  ([riff metro] (play riff metro (bar metro)))
-  ([riff metro br]
-     (let [notes-to-play (degrees->pitches (riff-notes riff) (riff-scale riff) (riff-root riff))]
+  ([riff inst metro] (play riff inst metro (bar metro)))
+  ([riff inst metro br]
+     (let [shifted-notes (move-degrees (riff-notes riff) (riff-shift riff))
+           notes-to-play  (degrees->pitches shifted-notes (riff-scale riff) (riff-root riff)) ]
        (info "play " riff " metro " br)
        (dorun
         (map (fn [note offset]
                (at
                 (+ (bar metro br) (* (tick metro) offset))
                 ;; (bar metro (+ br offset))
-                   (beep note)
+                   (inst note)
                    (info "RiffPlayer note: " note
                          "  time: " (bar metro (+ br offset)))))
              notes-to-play
              (riff-offsets riff)))
-       (apply-at (bar metro (inc br))  #'play riff [metro (inc br)]))))
+       (apply-at (bar metro (inc br))  #'play riff inst [metro (inc br)]))))
 
 (play riffp metro)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
