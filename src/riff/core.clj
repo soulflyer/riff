@@ -67,7 +67,7 @@
              (riff-offsets riff)))
        (apply-at (bar metro (inc br))  #'play riff inst [metro (inc br)]))))
 
-(play riffp metro)
+(play riffp beep metro)
 
 
 
