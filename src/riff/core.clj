@@ -13,8 +13,8 @@
     "Returns offsets or sets it to new-riff-offsets")
   (riff-shift [this] [this new-riff-shift]
     "Returns shift or sets it to new-riff-shift")
-  (riff-run [this] [this new-riff-run]
-    "returns or sets the boolean representing the run state")
+  (riff-run   [this]
+    "Checked to see if the riff should continue looping")
   (riff-stop [this]
     "sets the flag that will stop the riff at the end of it's current iteration"))
 
@@ -36,8 +36,6 @@
   (riff-shift   [this new-riff-shift]
     (reset! riff-shift new-riff-shift))
   (riff-run     [this] @riff-run)
-  (riff-run     [this new-riff-run]
-    (reset! riff-run new-riff-run))
   (riff-stop    [this]
     (reset! riff-run nil)))
 
@@ -71,7 +69,25 @@
              (riff-offsets riff)))
        (if (riff-run riff) (apply-at (bar metro (+ riff-length br))  #'play riff inst [metro (+ riff-length br)])))))
 
-
+(defn async-play
+  "plays a riff that repeats on the beat but independantly of the bar structure."
+  ([riff inst metro] (async-play riff inst metro (beat metro)))
+  ([riff inst metro bt]
+     (let [shifted-notes (move-degrees (riff-notes riff) (riff-shift riff))
+           notes-to-play (degrees->pitches shifted-notes (riff-scale riff) (riff-root riff))
+           riff-length   (+ 1 (first (reverse (sort (riff-offsets riff)))))]
+       (info "play " riff " metro " bt)
+       (dorun
+        (map (fn [note offset]
+               (at
+                (+ (beat metro bt) (* (tick metro) offset))
+                ;; (bar metro (+ br offset))
+                   (inst note)
+                   (info "RiffPlayer note: " note
+                         "  time: " (beat metro (+ bt offset)))))
+             notes-to-play
+             (riff-offsets riff)))
+       (if (riff-run riff) (apply-at (beat metro (+ riff-length bt))  #'async-play riff inst [metro (+ riff-length bt)])))))
 
 
 
