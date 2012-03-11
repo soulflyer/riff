@@ -1,7 +1,8 @@
 (ns riff.test
   (:use [overtone.live]
         [overtone.util.log]
-        [riff.core]))
+        [riff.core]
+        [overtone.inst.drum]))
 
 (definst beep [note 60]
   (let [src (sin-osc (midicps note))
@@ -13,3 +14,5 @@
 (def riffp (riff :c5 :major [:i :iii :v :i+] [0 1.5 2 3]))
 
 (play riffp beep metro)
+
+(async-play riffp beep metro)
