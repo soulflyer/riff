@@ -1,3 +1,5 @@
+####Riff
+
 Riff specifies patterns to be played starting at the begining of a bar.
 
 Note that it depends on a version of metronome that returns bar number.
