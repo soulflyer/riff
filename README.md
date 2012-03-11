@@ -7,35 +7,33 @@ This is currently in soulflyer/overtone (branch metronome) and not yet
 in the main overtone repository.
 
 Usage:
+First define a riff
 
-    (def riff-a (riff :c5 :major [:i :iii :v :i+] [1 2.5 3 4])
-
-defines a riff
+```clojure
+(def riff-a (riff :c5 :major [:i :iii :v :i+] [1 2.5 3 4])
+```
+Then play it (starting at the next bar start)
 
 ```clojure
 (play riff-a beep metro)
 ```
-
-plays it, starting at the next bar boundary.
+Change the key of the running riff:
 
 ```clojure
 (riff-scale riff-a :minor)
 ```
-
-changes the key of the running riff
+Move all the notes in the riff up by 3 steps of the current scale, staying
+within the scale. ie. [:i :iii :v :i+] becomes [:iv :vi :i+ :iv+]
+This could be used to echo a motif, or to create a parrallel harmony.
 
 ```clojure
 (riff-offset riff-a 3)
 ```
-
-Moves all the notes in the riff up by 3 steps of the current scale, staying
-within the scale. ie. [:i :iii :v :i+] becomes [:iv :vi :i+ :iv+]
-This can be used to echo a motif, or to create a parrallel harmony.
+Change the notes of the running riff, starting at the beginning of the next bar
 
 ```clojure
-
 (riff-notes riff-a [:i :v :iii :i+])
 
 ```
 
-Changes the notes of the running riff, starting at the beginning of the next bar
+
