@@ -33,7 +33,9 @@ within the scale. ie. [:i :iii :v :i+] becomes [:iv :vi :i+ :iv+]
 This can be used to echo a motif, or to create a parrallel harmony.
 
 ```clojure
+
 (riff-notes riff-a [:i :v :iii :i+])
+
 ```
 
 Changes the notes of the running riff, starting at the beginning of the next bar
