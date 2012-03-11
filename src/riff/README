@@ -26,4 +26,4 @@ This can be used to echo a motif, or to create a parrallel harmony.
 
 (riff-notes riff-a [:i :v :iii :i+])
 
-Changes the notes of the riff, starting at the beginning of the next bar
+Changes the notes of the running riff, starting at the beginning of the next bar
