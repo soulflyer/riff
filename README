@@ -6,9 +6,7 @@ in the main overtone repository.
 
 Usage:
 
-```javascript
-(def riff-a (riff :c5 :major [:i :iii :v :i+] [1 2.5 3 4])
-```
+    (def riff-a (riff :c5 :major [:i :iii :v :i+] [1 2.5 3 4])
 
 defines a riff
 
