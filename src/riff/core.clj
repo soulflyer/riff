@@ -62,16 +62,14 @@
   ([riff inst metro br]
      (let [shifted-notes (move-degrees (riff-notes riff) (riff-shift riff))
            notes-to-play (degrees->pitches shifted-notes (riff-scale riff) (riff-root riff))
-           riff-length   (+ 1 (quot (first (reverse (sort (riff-offsets riff)))) (bpb metro)))]
+           riff-length   (+ 1 (quot (- (first (reverse (sort (riff-offsets riff)))) 1) (bpb metro)))]
        (info "play " riff " metro " br)
        (dorun
         (map (fn [note offset vel]
-               (at
-                (+ (bar metro br) (* (tick metro) offset))
-                ;; (bar metro (+ br offset))
-                   (inst note vel)
-                   (info "RiffPlayer note: " note
-                         "  time: " (bar metro (+ br offset)))))
+               (let [corrected-offset (if (< 1 offset) (- offset 1) 0)]
+                 (at
+                 (+ (bar metro br) (* (tick metro) corrected-offset))
+                 (inst note vel))))
              notes-to-play
              (riff-offsets riff)
              (riff-vels riff)))
