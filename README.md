@@ -3,8 +3,8 @@
 Riff specifies patterns to be played starting at the begining of a bar.
 
 Note that it depends on a version of metronome that returns bar number.
-This is currently in soulflyer/overtone (branch metronome) and not yet
-in the main overtone repository.
+This is currently in soulflyer/overtone (branch metronome) and not the
+main overtone repository.
 
 Usage:
 First define a riff
