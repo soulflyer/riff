@@ -72,18 +72,19 @@
            notes-to-play (degrees->pitches shifted-notes (riff-scale riff) (riff-root riff))
            riff-length   (+ 1 (quot (- (first (reverse (sort (riff-offsets riff)))) 1) (bpb metro)))]
 
-       (dorun
-        (map (fn [note offset vel]
-               (let [corrected-offset (if (< 1 offset) (- offset 1) 0)]
-                 (at
-                 (+ (bar metro br) (* (tick metro) corrected-offset))
-                 (inst note vel))))
-             notes-to-play
-             (riff-offsets riff)
-             (riff-vels riff)))
        (if (riff-run riff)
-         (apply-at (bar metro (+ riff-length br))
-                   #'play riff inst [metro (+ riff-length br)])
+         (do
+          (dorun
+           (map (fn [note offset vel]
+                  (let [corrected-offset (if (< 1 offset) (- offset 1) 0)]
+                    (at
+                     (+ (bar metro br) (* (tick metro) corrected-offset))
+                     (inst note vel))))
+                notes-to-play
+                (riff-offsets riff)
+                (riff-vels riff)))
+          (apply-at (bar metro (+ riff-length br))
+                    #'play riff inst [metro (+ riff-length br)]))
          (riff-start riff)))))
 
 
