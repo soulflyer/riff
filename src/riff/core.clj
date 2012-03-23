@@ -20,9 +20,18 @@
   (riff-stop    [this]
     "sets the flag that will stop the riff at the end of it's current iteration")
   (riff-start   [this]
-    "sets the flag that allows the riff to continue repeating"))
+    "sets the flag that allows the riff to continue repeating")
+  (riff-vol     [this] [this new-riff-vol]
+    "Returns the volume or sets it")
+  (riff-muted   [this]
+    "checked to see if riff should be audible")
+  (riff-mute    [this]
+    "mute the riff")
+  (riff-unmute  [this]
+    "unmute the riff"))
 
-(deftype Riff [riff-root riff-scale riff-notes riff-offsets riff-vels riff-shift riff-run]
+(deftype Riff [riff-root riff-scale riff-notes riff-offsets riff-vels
+               riff-shift riff-run riff-vol riff-muted]
   IRiff
   (riff-root    [this] @riff-root)
   (riff-root    [this new-riff-root]
@@ -46,7 +55,15 @@
   (riff-stop    [this]
     (reset! riff-run nil))
   (riff-start   [this]
-    (reset! riff-run 1)))
+    (reset! riff-run 1))
+  (riff-vol     [this] @riff-vol)
+  (riff-vol     [this new-riff-vol]
+    (reset! riff-vol new-riff-vol))
+  (riff-muted   [this] @riff-muted)
+  (riff-mute    [this]
+    (reset! riff-muted 1))
+  (riff-unmute  [this]
+    (reset! riff-muted nil)))
 
 (defn riff [riff-root riff-scale riff-notes riff-offsets]
   (let [length       (count riff-notes)
@@ -56,8 +73,11 @@
         riff-offsets (atom riff-offsets)
         riff-vels    (atom (repeat length 0.7))
         riff-shift   (atom 0)
-        riff-run     (atom 1)]
-    (Riff. riff-root riff-scale riff-notes riff-offsets riff-vels riff-shift riff-run)))
+        riff-run     (atom 1)
+        riff-vol     (atom 0.7)
+        riff-muted   (atom nil)]
+    (Riff. riff-root riff-scale riff-notes riff-offsets riff-vels
+           riff-shift riff-run riff-vol riff-muted)))
 
 (def metro (metronome 130))
 
@@ -79,7 +99,7 @@
                   (let [corrected-offset (if (< 1 offset) (- offset 1) 0)]
                     (at
                      (+ (bar metro br) (* (tick metro) corrected-offset))
-                     (inst note vel))))
+                     (inst note vel (riff-vol riff)))))
                 notes-to-play
                 (riff-offsets riff)
                 (riff-vels riff)))
